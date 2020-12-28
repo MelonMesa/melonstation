@@ -1,7 +1,4 @@
-# .NET Desktop
-# Build and run tests for .NET Desktop or Windows classic desktop solutions.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+# Funny attempt to do the same thing they do with Jenkins but in Azure
 
 trigger:
 - main
@@ -20,15 +17,40 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '5.0.100'
-    includePreviewVersions: true
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet restore'
+- task: UsePythonVersion@0
+  displayName: 'Use Python 3.x'
   inputs:
-    command: restore
-    projects: '**/*.csproj'
+    versionSpec: '3.x'
+    addToPath: true
+    architecture: 'x64'
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
+- task: PythonScript@0
+  displayName: 'Run server build script'
   inputs:
-    command: 'build'
+    scriptSource: 'filePath'
+    scriptPath: 'Tools/package_server_build.py'
+    arguments: '-p windows mac linux linux-arm646'
+
+- task: PythonScript@0
+  displayName: 'Run client build script'
+  inputs:
+    scriptSource: 'filePath'
+    scriptPath: 'Tools/package_client_build.py'
+
+- task: PythonScript@0
+  displayName: 'Update build info'
+  inputs:
+    scriptSource: 'filePath'
+    scriptPath: 'Tools/gen_build_info.py'
+
+- task: PowerShell@2
+  displayName: 'Generate checksums'
+  inputs:
+    filePath: 'Tools/generate_hashes.ps1'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/release'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
