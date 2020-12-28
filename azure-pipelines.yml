@@ -12,7 +12,7 @@ variables:
   buildConfiguration: 'Release'
 
 jobs:
-  - job: setup
+  - job: run_build
     steps:
     - task: UseDotNet@2
       displayName: 'Use .NET Core sdk 5.0.100'
@@ -25,8 +25,6 @@ jobs:
         versionSpec: '3.x'
         addToPath: true
         architecture: 'x64'
-  - job: build
-    steps:
     - task: PythonScript@0
       displayName: 'Run server build script'
       inputs:
@@ -38,21 +36,15 @@ jobs:
       inputs:
         scriptSource: 'filePath'
         scriptPath: 'Tools/package_client_build.py'
-  - job: update_build_info
-    steps:
     - task: PythonScript@0
       displayName: 'Update build info'
       inputs:
         scriptSource: 'filePath'
         scriptPath: 'Tools/gen_build_info.py'
-  - job: generate_checksums
-    steps:
     - task: PowerShell@2
       displayName: 'Generate checksums'
       inputs:
         filePath: 'Tools/generate_hashes.ps1'
-  - job: publish_artifacts
-    steps:
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: 'release'
