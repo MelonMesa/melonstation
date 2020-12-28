@@ -33,10 +33,10 @@ def inject_manifest(zip_path: str, manifest: str) -> None:
 
 
 def generate_manifest(dir: str) -> str:
-    # Env variables set by Jenkins.
+    # Env variables set by Azure Devops.
 
-    version = os.environ["BUILD_NUMBER"]
-    download = f"{os.environ['BUILD_URL']}artifact/release/{FILE}"
+    version = os.environ["BUILD_BUILDNUMBER"]
+    download = f"https://dev.azure.com/melonmesa/melonstation/_apis/build/builds/{os.environ["BUILD_BUILDID"]}/artifacts?artifactName={FILE}&api-version=6.0"
     hash = sha256_file(os.path.join(dir, FILE))
     engine_version = get_engine_version()
 
