@@ -36,7 +36,7 @@ def generate_manifest(dir: str) -> str:
     # Env variables set by Azure Devops.
 
     version = os.environ["BUILD_BUILDNUMBER"]
-    download = f"https://dev.azure.com/melonmesa/melonstation/_apis/build/builds/{os.environ['BUILD_BUILDID']}/artifacts?artifactName={FILE}&api-version=6.0"
+    download = f"https://dev.azure.com/melonmesa/_apis/resources/Containers/{os.environ['BUILD_CONTAINERID']}/drop?itemPath=drop/{FILE}"
     hash = sha256_file(os.path.join(dir, FILE))
     engine_version = get_engine_version()
 
