@@ -17,7 +17,7 @@ SERVER_FILES = [
     "SS14.Server_macOS_x64.zip"
 ]
 
-FORK_ID = "wizards"
+FORK_ID = "melonstation"
 
 
 def main() -> None:
