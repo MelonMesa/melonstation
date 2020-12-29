@@ -1,0 +1,48 @@
+# Funny attempt to do the same thing they do with Github Actions but in Azure
+
+trigger:
+- main
+
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-latest'
+    windows:
+      imageName: 'windows-latest'
+
+pool:
+  vmImage: $(imageName)
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+jobs:
+  - job: run_build_and_test
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk 5.0.100'
+      inputs:
+        packageType: 'sdk'
+        version: '5.0.100'
+    - script: touch BuildChecker/DISABLE_SUBMODULE_AUTOUPDATE
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore'
+      inputs:
+        command: 'restore'
+    - task: DotNetCoreCLI@2
+      displayName: 'Build'
+      inputs:
+        command: 'build'
+        arguments: '--configuration Release --no-restore /p:WarningsAsErrors=nullable'
+    - task: DotNetCoreCLI@2
+      displayName: 'Content.Tests'
+      inputs:
+        command: 'test'
+        arguments: '--no-build Content.Tests/Content.Tests.csproj -v n'
+    - task: DotNetCoreCLI@2
+      displayName: 'Content.IntegrationTests'
+      inputs:
+        command: 'test'
+        arguments: '--no-build Content.IntegrationTests/Content.IntegrationTests.csproj -v n'
