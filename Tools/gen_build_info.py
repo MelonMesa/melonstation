@@ -17,7 +17,7 @@ SERVER_FILES = [
     "SS14.Server_macOS_x64.zip"
 ]
 
-FORK_ID = "wizards"
+FORK_ID = "melonstation"
 
 
 def main() -> None:
@@ -33,10 +33,10 @@ def inject_manifest(zip_path: str, manifest: str) -> None:
 
 
 def generate_manifest(dir: str) -> str:
-    # Env variables set by Jenkins.
+    # Env variables set by Azure Devops.
 
-    version = os.environ["BUILD_NUMBER"]
-    download = f"{os.environ['BUILD_URL']}artifact/release/{FILE}"
+    version = os.environ["BUILD_BUILDNUMBER"]
+    download = f"https://dev.azure.com/melonmesa/_apis/resources/Containers/{os.environ['BUILD_CONTAINERID']}/drop?itemPath=drop/{FILE}"
     hash = sha256_file(os.path.join(dir, FILE))
     engine_version = get_engine_version()
 

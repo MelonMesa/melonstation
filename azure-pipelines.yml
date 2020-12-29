@@ -1,0 +1,53 @@
+# Funny attempt to do the same thing they do with Jenkins but in Azure
+
+trigger:
+- main
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+jobs:
+  - job: run_build
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk 5.0.100'
+      inputs:
+        packageType: 'sdk'
+        version: '5.0.100'
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.x'
+      inputs:
+        versionSpec: '3.x'
+        addToPath: true
+        architecture: 'x64'
+    - task: PythonScript@0
+      displayName: 'Run server build script'
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'Tools/package_server_build.py'
+        arguments: '-p windows mac linux linux-arm64'
+    - task: PythonScript@0
+      displayName: 'Run client build script'
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'Tools/package_client_build.py'
+    - task: PythonScript@0
+      displayName: 'Update build info'
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: 'Tools/gen_build_info.py'
+    - task: PowerShell@2
+      displayName: 'Generate checksums'
+      inputs:
+        filePath: 'Tools/generate_hashes.ps1'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'release'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
