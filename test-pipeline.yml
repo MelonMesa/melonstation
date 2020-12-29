@@ -19,6 +19,17 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '5.0.100'
+- task: UsePythonVersion@0
+  displayName: 'Use Python 3.x'
+  inputs:
+    versionSpec: '3.x'
+    addToPath: true
+    architecture: 'x64'
+- task: PythonScript@0
+  displayName: 'Setup submodules'
+  inputs:
+    scriptSource: 'filePath'
+    scriptPath: 'RUN_THIS.py'
 - script: touch BuildChecker/DISABLE_SUBMODULE_AUTOUPDATE
 - task: DotNetCoreCLI@2
   displayName: 'Restore'
