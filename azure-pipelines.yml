@@ -1,7 +1,7 @@
 # Funny attempt to do the same thing they do with Jenkins but in Azure
 
 trigger:
-- main
+- master
 pr: none
 
 pool:
